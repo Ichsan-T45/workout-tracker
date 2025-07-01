@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Workout Tracker Tia</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f8f9fa;
+      color: #333;
+      padding: 1rem;
+      max-width: 900px;
+      margin: auto;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+    }
+    .card {
+      background: white;
+      padding: 1rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    .card:hover {
+      transform: scale(1.02);
+    }
+    .hidden {
+      display: none;
+    }
+    .workout-detail {
+      margin-top: 2rem;
+    }
+    .workout-detail h2 {
+      margin-bottom: 1rem;
+    }
+    label {
+      display: block;
+      margin: 0.3rem 0;
+    }
+    input[type="checkbox"] {
+      transform: scale(1.2);
+      margin-right: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Halo Tia Sayang 💪<br>Semangat ya workout hari ini!</h1>
+  <div class="grid" id="dayCards"></div>
+
+  <div id="workoutDetail" class="workout-detail hidden">
+    <h2 id="dayTitle"></h2>
+    <div id="exerciseList"></div>
+  </div>
+
+  <script>
+    const data = {
+      "Senin": [
+        { name: "Barbell Romanian Deadlift", sets: 4, reps: 10, rest: "60 detik" },
+        { name: "Kettlebell Goblet Squat", sets: 3, reps: 12, rest: "45 detik" },
+        { name: "Dumbbell Step-Up", sets: 3, reps: 10, rest: "45 detik" },
+        { name: "Kettlebell Swing", sets: 3, reps: 20, rest: "30 detik" },
+        { name: "Glute Bridge Hold", sets: 3, reps: 30, rest: "30 detik" },
+      ],
+      "Selasa": [
+        { name: "Cable Lat Pulldown", sets: 4, reps: 12, rest: "60 detik" },
+        { name: "Single Arm Dumbbell Row", sets: 3, reps: 10, rest: "45 detik" },
+        { name: "Cable Rope Face Pull", sets: 3, reps: 15, rest: "45 detik" },
+        { name: "Barbell Curl", sets: 3, reps: 12, rest: "60 detik" },
+        { name: "Plank", sets: 3, reps: "45 detik", rest: "30 detik" },
+      ],
+      "Rabu": [
+        { name: "HIIT: Jumping Jacks, Kettlebell Swing, Mountain Climber", sets: 5, reps: "30 detik tiap gerakan", rest: "30 detik" },
+        { name: "Russian Twist", sets: 3, reps: 20, rest: "30 detik" },
+        { name: "Bicycle Crunch", sets: 3, reps: 20, rest: "30 detik" },
+        { name: "Leg Raise", sets: 3, reps: 15, rest: "30 detik" },
+        { name: "Plank", sets: 3, reps: "45 detik", rest: "30 detik" },
+      ],
+      "Kamis": [
+        { name: "Barbell Back Squat", sets: 4, reps: 8, rest: "60 detik" },
+        { name: "Dumbbell Bulgarian Split Squat", sets: 3, reps: 10, rest: "45 detik" },
+        { name: "Kettlebell Sumo Deadlift", sets: 3, reps: 12, rest: "45 detik" },
+        { name: "Cable Glute Kickback", sets: 3, reps: 15, rest: "30 detik" },
+        { name: "Calf Raise", sets: 3, reps: 20, rest: "30 detik" },
+      ],
+      "Jumat": [
+        { name: "Dumbbell Chest Press", sets: 3, reps: 10, rest: "60 detik" },
+        { name: "Dumbbell Shoulder Press", sets: 3, reps: 12, rest: "45 detik" },
+        { name: "Dumbbell Lateral Raise", sets: 3, reps: 15, rest: "45 detik" },
+        { name: "Tricep Rope Pushdown", sets: 3, reps: 15, rest: "30 detik" },
+        { name: "Overhead Tricep Extension", sets: 3, reps: 12, rest: "30 detik" },
+      ],
+      "Sabtu": [
+        { name: "Jalan cepat / Mobility", sets: 1, reps: "30 menit", rest: "" },
+        { name: "Full Body Circuit", sets: 3, reps: 5, rest: "" },
+        { name: "Foam Rolling / Yoga", sets: 1, reps: "10-15 menit", rest: "" },
+      ],
+      "Minggu": []
+    };
+
+    const container = document.getElementById('dayCards');
+    const detail = document.getElementById('workoutDetail');
+    const dayTitle = document.getElementById('dayTitle');
+    const exerciseList = document.getElementById('exerciseList');
+
+    for (const day in data) {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerText = day === 'Minggu' ? 'Minggu\nRest & Recovery 💆‍♀️\n"Recovery is also progress."' : day;
+      card.addEventListener('click', () => {
+        detail.classList.remove('hidden');
+        dayTitle.innerText = `Workout Hari ${day}`;
+        exerciseList.innerHTML = '';
+
+        if (data[day].length === 0) {
+          exerciseList.innerHTML = '<p>Rest day. Take a break and recharge 💖</p>';
+          return;
+        }
+
+        data[day].forEach((ex, i) => {
+          const id = `${day}-${i}`;
+          const label = document.createElement('label');
+          const checkbox = document.createElement('input');
+          checkbox.type = 'checkbox';
+          checkbox.id = id;
+          checkbox.checked = localStorage.getItem(id) === 'true';
+          checkbox.addEventListener('change', () => {
+            localStorage.setItem(id, checkbox.checked);
+          });
+
+          const info = `${ex.name} — ${ex.sets} set x ${ex.reps} (Rest: ${ex.rest})`;
+          label.appendChild(checkbox);
+          label.appendChild(document.createTextNode(info));
+          exerciseList.appendChild(label);
+        });
+      });
+
+      container.appendChild(card);
+    }
+  </script>
+</body>
+</html>
